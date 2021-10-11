@@ -3,6 +3,8 @@ package com.plcoding.doodlekong.di
 import android.content.Context
 import com.google.gson.Gson
 import com.plcoding.doodlekong.data.remote.api.SetupApi
+import com.plcoding.doodlekong.repository.DefaultSetupRepository
+import com.plcoding.doodlekong.repository.SetupRepository
 import com.plcoding.doodlekong.util.Constants.HTTP_BASE_URL
 import com.plcoding.doodlekong.util.Constants.HTTP_BASE_URL_LOCALHOST
 import com.plcoding.doodlekong.util.Constants.HTTP_USES_LOCAL_HOST
@@ -67,5 +69,12 @@ object AppModule {
                 get() = Dispatchers.Default
         }
     }
+
+    @Singleton
+    @Provides
+    fun provideSetupRepository(
+        setupApi: SetupApi,
+        @ApplicationContext context: Context
+    ): SetupRepository = DefaultSetupRepository(setupApi, context)
 
 }

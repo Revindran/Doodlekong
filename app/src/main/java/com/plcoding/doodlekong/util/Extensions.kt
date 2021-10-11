@@ -4,6 +4,14 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Bundle
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
+import com.google.android.material.snackbar.Snackbar
 
 fun Context.checkInternetConnection(): Boolean {
     val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -21,4 +29,25 @@ fun Context.checkInternetConnection(): Boolean {
     }
 
     return connectivityManager.activeNetworkInfo?.isAvailable ?: false
+}
+
+fun Fragment.snackbar(text: String) {
+    Snackbar.make(requireView(), text, Snackbar.LENGTH_LONG).show()
+}
+
+fun Fragment.snackbar(@StringRes res: Int) {
+    Snackbar.make(requireView(), res, Snackbar.LENGTH_LONG).show()
+}
+
+
+fun NavController.navigateSafely(
+    @IdRes resId: Int,
+    args: Bundle? = null,
+    navOptions: NavOptions? = null,
+    navExtras: Navigator.Extras? = null
+) {
+    val action = currentDestination?.getAction(resId) ?: graph.getAction(resId)
+    if (action != null && currentDestination?.id != action.destinationId) {
+        navigate(resId, args, navOptions, navExtras)
+    }
 }
