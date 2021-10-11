@@ -10,6 +10,7 @@ import androidx.viewbinding.ViewBinding
 import com.plcoding.doodlekong.R
 import com.plcoding.doodlekong.databinding.FragmentUsernameBinding
 import com.plcoding.doodlekong.ui.setup.SetUpViewModel
+import com.plcoding.doodlekong.ui.setup.UsernameViewModel
 import com.plcoding.doodlekong.util.BindingFragment
 import com.plcoding.doodlekong.util.Constants.MAX_USER_NAME_LENGTH
 import com.plcoding.doodlekong.util.Constants.MIN_USER_NAME_LENGTH
@@ -23,7 +24,7 @@ class UsernameFragment : BindingFragment<FragmentUsernameBinding>() {
     override val bindingInflater: (LayoutInflater) -> ViewBinding
         get() = FragmentUsernameBinding::inflate
 
-    private val viewMode: SetUpViewModel by viewModels()
+    private val viewMode: UsernameViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,22 +38,21 @@ class UsernameFragment : BindingFragment<FragmentUsernameBinding>() {
         lifecycleScope.launchWhenStarted {
             viewMode.setupEvent.collect { event ->
                 when (event) {
-                    is SetUpViewModel.SetupEvent.NavigateToSelectedRoomEvent -> {
+                    is UsernameViewModel.SetupEvent.NavigateToSelectedRoomEvent -> {
                         findNavController().navigateSafely(
                             R.id.action_usernameFragment_to_selectRoomFragment,
                             args = Bundle().apply { putString("userName", event.username) }
                         )
                     }
-                    is SetUpViewModel.SetupEvent.InputEmptyError -> {
+                    is UsernameViewModel.SetupEvent.InputEmptyError -> {
                         snackbar(R.string.error_field_empty)
                     }
-                    is SetUpViewModel.SetupEvent.InputTooShortEvent -> {
+                    is UsernameViewModel.SetupEvent.InputTooShortEvent -> {
                         snackbar(getString(R.string.error_username_too_short, MIN_USER_NAME_LENGTH))
                     }
-                    is SetUpViewModel.SetupEvent.InputTooLongEvent -> {
+                    is UsernameViewModel.SetupEvent.InputTooLongEvent -> {
                         snackbar(getString(R.string.error_username_too_long, MAX_USER_NAME_LENGTH))
                     }
-                    else -> Unit
                 }
             }
         }
