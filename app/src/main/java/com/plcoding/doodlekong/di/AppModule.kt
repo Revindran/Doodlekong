@@ -9,6 +9,8 @@ import com.plcoding.doodlekong.util.Constants.HTTP_BASE_URL
 import com.plcoding.doodlekong.util.Constants.HTTP_BASE_URL_LOCALHOST
 import com.plcoding.doodlekong.util.Constants.HTTP_USES_LOCAL_HOST
 import com.plcoding.doodlekong.util.DispatcherProvider
+import com.plcoding.doodlekong.util.clientId
+import com.plcoding.doodlekong.util.dataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -28,10 +31,22 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }).build()
+    fun provideOkHttpClient(clientID: String): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val url = chain.request().url.newBuilder()
+                    .addQueryParameter("client_id", clientID)
+                    .build()
+
+                val request = chain.request().newBuilder()
+                    .url(url)
+                    .build()
+                chain.proceed(request)
+            }
+
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }).build()
     }
 
     @Singleton
@@ -76,5 +91,11 @@ object AppModule {
         setupApi: SetupApi,
         @ApplicationContext context: Context
     ): SetupRepository = DefaultSetupRepository(setupApi, context)
+
+    @Singleton
+    @Provides
+    fun provideClientID(@ApplicationContext context: Context): String {
+        return runBlocking { context.dataStore.clientId() }
+    }
 
 }

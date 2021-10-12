@@ -11,5 +11,4 @@ object Constants {
     const val MAX_ROOM_NAME_LENGTH = 12
 
     const val SEARCH_DELAY = 300L
-
 }
