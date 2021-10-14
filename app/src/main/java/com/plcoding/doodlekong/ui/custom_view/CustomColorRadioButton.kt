@@ -1,4 +1,4 @@
-package com.plcoding.doodlekong.ui.view
+package com.plcoding.doodlekong.ui.custom_view
 
 import android.content.Context
 import android.graphics.Canvas

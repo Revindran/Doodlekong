@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.plcoding.doodlekong.ui.custom_view.DrawingView
             android:id="@+id/drawingView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -29,44 +29,44 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/drawingView">
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbRed"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:buttonColor="@color/red" />
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbGreen"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:buttonColor="@color/green" />
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbBlue"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:buttonColor="@android:color/holo_blue_dark" />
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbOrange"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:buttonColor="@color/orange" />
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbYellow"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 app:buttonColor="@color/yellow" />
 
-            <com.plcoding.doodlekong.ui.view.CustomColorRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomColorRadioButton
                 android:id="@+id/rbBlack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:checked="true"
                 app:buttonColor="@color/black" />
 
-            <com.plcoding.doodlekong.ui.view.CustomImageRadioButton
+            <com.plcoding.doodlekong.ui.custom_view.CustomImageRadioButton
                 android:id="@+id/rbEraser"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
