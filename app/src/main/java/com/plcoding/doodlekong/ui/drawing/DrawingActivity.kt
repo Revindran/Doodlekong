@@ -9,14 +9,21 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.plcoding.doodlekong.R
+import com.plcoding.doodlekong.data.remote.ws.models.GameError
+import com.plcoding.doodlekong.data.remote.ws.models.JoinRoomHandshake
 import com.plcoding.doodlekong.databinding.ActivityDrawingBinding
 import com.plcoding.doodlekong.util.Constants
+import com.tinder.scarlet.WebSocket
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DrawingActivity : AppCompatActivity() {
@@ -24,6 +31,11 @@ class DrawingActivity : AppCompatActivity() {
     lateinit var binding: ActivityDrawingBinding
 
     private val viewModel: DrawingViewModel by viewModels()
+
+    private val args: DrawingActivityArgs by navArgs()
+
+    @Inject
+    lateinit var clientID: String
 
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var rvPlayers: RecyclerView
@@ -33,6 +45,9 @@ class DrawingActivity : AppCompatActivity() {
         binding = ActivityDrawingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         subscribeToUIUpdates()
+        listenToConnectionEvents()
+        listenToSocketEvents()
+
         binding.colorGroup.setOnCheckedChangeListener { _, i ->
             viewModel.checkRadioButton(i)
         }
@@ -60,7 +75,39 @@ class DrawingActivity : AppCompatActivity() {
             override fun onDrawerStateChanged(newState: Int) = Unit
         })
 
+        binding.drawingView.setOnDrawListener {
+            if (binding.drawingView.isUserDrawing) {
+                viewModel.sendBaseModel(it)
+            }
+        }
 
+
+    }
+
+    private fun listenToConnectionEvents() = lifecycleScope.launchWhenStarted {
+        viewModel.connectionEvent.collect { event ->
+            when (event) {
+                is WebSocket.Event.OnConnectionOpened<*> -> {
+                    viewModel.sendBaseModel(
+                        JoinRoomHandshake(args.userName, args.roomName, clientID)
+                    )
+                    viewModel.connectionProgressBarVisibility(false)
+                }
+                is WebSocket.Event.OnConnectionClosed -> {
+                    viewModel.connectionProgressBarVisibility(false)
+                }
+                is WebSocket.Event.OnConnectionFailed -> {
+                    viewModel.connectionProgressBarVisibility(false)
+                    event.throwable.printStackTrace()
+                    Snackbar.make(
+                        binding.root,
+                        R.string.error_coonection_falied,
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
+                else -> Unit
+            }
+        }
     }
 
     private fun selectColor(color: Int) {
@@ -86,6 +133,29 @@ class DrawingActivity : AppCompatActivity() {
                         binding.drawingView.setThickness(40f)
                     }
                 }
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.chooseWordOverlay.collect { isVisible ->
+                binding.chooseWordOverlay.isVisible = isVisible
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.connectionProgressVisible.collect { isVisible ->
+                binding.connectionProgressBar.isVisible = isVisible
+            }
+        }
+    }
+
+    private fun listenToSocketEvents() = lifecycleScope.launchWhenStarted {
+        viewModel.socketEvent.collect { event ->
+            when (event) {
+                is DrawingViewModel.SocketEvent.GameErrorEvent -> {
+                    when (event.data.errorType) {
+                        GameError.ERROR_ROOM_NOT_FOUND -> finish()
+                    }
+                }
+                else -> Unit
             }
         }
     }
