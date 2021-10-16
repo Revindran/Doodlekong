@@ -81,7 +81,6 @@ class DrawingActivity : AppCompatActivity() {
             }
         }
 
-
     }
 
     private fun listenToConnectionEvents() = lifecycleScope.launchWhenStarted {
